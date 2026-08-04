@@ -1,0 +1,36 @@
+body {
+  margin: auto;
+  height: 100vh;
+  width: 50%;
+  text-align: center;
+}
+
+#container {
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+}
+
+#player1,
+#player2 {
+  display: flex;
+  width: 500px;
+  height: 500px;
+}
+
+#player1 div,
+#player2 div {
+  border: 1px solid grey;
+  width: 45px;
+  height: 45px;
+}
+
+#player1 > div,
+#player2 > div {
+  display: grid;
+}
+
+.inactive div {
+  background-color: lightgrey;
+  border: 1px dashed lightgray;
+}
