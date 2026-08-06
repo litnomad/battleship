@@ -123,24 +123,24 @@ class Gameboard {
 
 // throws an error if ships overlap
 class Player {
-  constructor(array) {
-    for (let i = 0, j = i + 1; i < array.length; i++, j++) {
+  constructor(input) {
+    for (let i = 0, j = i + 1; i < input.length; i++, j++) {
       let index = j;
-      while (index < array.length) {
-        let col1 = array[i][0][0];
-        let col2 = array[index][0][0];
-        let dir1 = array[i][2];
-        let dir2 = array[index][2];
+      while (index < input.length) {
+        let col1 = input[i][0][0];
+        let col2 = input[index][0][0];
+        let dir1 = input[i][2];
+        let dir2 = input[index][2];
         if (col1 == col2 && dir1 == dir2) {
-          let row1 = array[i][0][1];
-          let row2 = array[index][0][1];
-          let length1 = array[i][1];
-          let length2 = array[index][1];
+          let row1 = input[i][0][1];
+          let row2 = input[index][0][1];
+          let length1 = input[i][1];
+          let length2 = input[index][1];
           while (length1 > 0) {
-            row1++;
             if (row1 == row2) {
               throw new Error("No overlapping ships!");
             }
+            row1++;
             length1--;
           }
 
@@ -157,7 +157,7 @@ class Player {
       }
     }
 
-    this.board = new Gameboard(array);
+    this.board = new Gameboard(input);
   }
 }
 
@@ -196,4 +196,32 @@ function computerAttacks() {
   };
 }
 
-export { createBoard, placeShips, Ship, Player, playerTurn, computerAttacks };
+// returns true if all ships are sunk, otherwise returns false
+function allSunk(gameBoard) {
+  for (let column = 0; column < gameBoard.length; column++) {
+    for (let row = 0; row < gameBoard[column].length; row++) {
+      if (typeof gameBoard[column][row][0] == "object") {
+        if (gameBoard[column][row][0].sunk == false) {
+          return false;
+        }
+        if (gameBoard[column][row][0].sunk == true) {
+          continue;
+        }
+      }
+      if (gameBoard[column][row][0] == "miss") {
+        continue;
+      }
+    }
+    return true;
+  }
+}
+
+export {
+  createBoard,
+  placeShips,
+  Ship,
+  Player,
+  playerTurn,
+  computerAttacks,
+  allSunk,
+};

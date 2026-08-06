@@ -1,4 +1,10 @@
-import { switchPlayer, computerAttacks, Player, playerTurn } from "./logic.js";
+import {
+  switchPlayer,
+  computerAttacks,
+  Player,
+  playerTurn,
+  allSunk,
+} from "./logic.js";
 import "./style.css";
 
 // get player 1's coordinates
@@ -21,7 +27,7 @@ for (let i = 0; i < board.length; i++) {
 
   for (let j = 0; j < board[i].length; j++) {
     const row = document.createElement("div");
-    row.setAttribute("id", "row" + i + j);
+    row.setAttribute("id", i + "-" + j);
     column.appendChild(row);
 
     if (typeof board[i][j][0] === "object") {
@@ -43,6 +49,10 @@ const computer = new Player([
 const player2 = document.querySelector("#player2");
 const board2 = computer.board.getBoard();
 
+// win statement
+const body = document.querySelector("body");
+const comment = document.createElement("div");
+
 for (let i = 0; i < board2.length; i++) {
   const column = document.createElement("div");
   column.setAttribute("id", "col" + i);
@@ -50,7 +60,7 @@ for (let i = 0; i < board2.length; i++) {
 
   for (let j = 0; j < board2[i].length; j++) {
     const row = document.createElement("div");
-    row.setAttribute("id", "row" + i + j);
+    row.setAttribute("id", i + "-" + j);
     column.appendChild(row);
 
     if (typeof board2[i][j][0] === "object") {
@@ -74,24 +84,44 @@ for (let i = 0; i < board2.length; i++) {
           row.textContent = board2[i][j][0];
         }
 
-        playerTurn("computer");
+        // if all ships are sunk, display win and end game
+        if (
+          allSunk(computer.board.getBoard()) === true ||
+          allSunk(player.board.getBoard() === true)
+        ) {
+          player1.classList = "inactive";
+          player2.classList = "inactive";
 
-        // computer automatically attacks after player's turn
-        const x = computerAttacks().column;
-        const y = computerAttacks().row;
-        console.log(x, y);
-        player.board.receiveAttack(x, y);
+          if (allSunk(player.board.getBoard())) {
+            comment.textContent =
+              "All battleships are sunk. Player 2 wins!";
+          }
 
-        const playerBoard = document.querySelector(`#row${x}${y}`);
+          if (allSunk(computer.board.getBoard())) {
+            comment.textContent = "All battleships are sunk. Player 1 wins!";
+          }
 
-        if (player.board.getBoard()[x][y][0] == "miss") {
-          playerBoard.textContent = "miss";
-        } else if (player.board.getBoard()[x][y][0].length > 0) {
-          playerBoard.style.borderStyle = "dashed";
-          playerBoard.style.borderColor = "red";
+          body.appendChild(comment);
+        } else {
+          playerTurn("computer");
+
+          // computer automatically attacks after player's turn
+          const x = computerAttacks().column;
+          const y = computerAttacks().row;
+          console.log(x, y);
+          player.board.receiveAttack(x, y);
+
+          const playerBoard = document.getElementById(`${x}-${y}`);
+
+          if (player.board.getBoard()[x][y][0] == "miss") {
+            playerBoard.textContent = "miss";
+          } else if (player.board.getBoard()[x][y][0].length > 0) {
+            playerBoard.style.borderStyle = "dashed";
+            playerBoard.style.borderColor = "red";
+          }
+
+          playerTurn("player");
         }
-
-        playerTurn("player");
       }
     });
   }
