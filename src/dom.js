@@ -1,19 +1,7 @@
-import { Player } from "./logic.js";
+import { switchPlayer, computerAttacks, Player, playerTurn } from "./logic.js";
 import "./style.css";
 
-function switchPlayer(activeplayer = player) {
-  if (activeplayer === player) {
-    player1.classList = "inactive";
-    player2.classList = "active";
-  }
-  if (activeplayer === computer) {
-    player1.classList = "active";
-    player2.classList = "inactive";
-  }
-}
-
-// player 1 gameboard
-// get coordinates
+// get player 1's coordinates
 const player = new Player([
   [[0, 8], 3, "horizontal"],
   [[5, 0], 4, "vertical"],
@@ -22,11 +10,9 @@ const player = new Player([
   [[9, 7], 3, "vertical"],
 ]);
 
-// get gameboard
-const board = player.board.getBoard();
-
-// render gameboard
+// render player 1 gameboard
 const player1 = document.querySelector("#player1");
+const board = player.board.getBoard();
 
 for (let i = 0; i < board.length; i++) {
   const column = document.createElement("div");
@@ -35,36 +21,16 @@ for (let i = 0; i < board.length; i++) {
 
   for (let j = 0; j < board[i].length; j++) {
     const row = document.createElement("div");
-    row.setAttribute("id", "row" + j);
+    row.setAttribute("id", "row" + i + j);
     column.appendChild(row);
 
-    if (board[i][j].length > 0) {
+    if (typeof board[i][j][0] === "object") {
       row.style.backgroundColor = "grey";
     }
-
-    // click event triggers hit function
-    row.addEventListener("click", (event) => {
-      console.log(i, j);
-
-      if (row.textContent != "miss") {
-        player.board.receiveAttack(i, j);
-      }
-
-      if (board[i][j][0] != "miss") {
-        board[i][j][0].hit;
-        row.style.borderStyle = "dashed";
-        row.style.borderColor = "red";
-      } else {
-        row.textContent = board[i][j][0];
-      }
-
-      switchPlayer(player);
-    });
   }
 }
 
-// player 2 gameboard
-// get coordinates
+// get player 2's coordinates
 const computer = new Player([
   [[0, 8], 3, "horizontal"],
   [[5, 0], 4, "vertical"],
@@ -73,11 +39,9 @@ const computer = new Player([
   [[9, 7], 3, "vertical"],
 ]);
 
-// get gameboard
-const board2 = computer.board.getBoard();
-
-// render gameboard
+// render player 2 gameboard
 const player2 = document.querySelector("#player2");
+const board2 = computer.board.getBoard();
 
 for (let i = 0; i < board2.length; i++) {
   const column = document.createElement("div");
@@ -86,30 +50,49 @@ for (let i = 0; i < board2.length; i++) {
 
   for (let j = 0; j < board2[i].length; j++) {
     const row = document.createElement("div");
-    row.setAttribute("id", "row" + j);
+    row.setAttribute("id", "row" + i + j);
     column.appendChild(row);
 
-    if (board2[i][j].length > 0) {
+    if (typeof board2[i][j][0] === "object") {
       row.style.backgroundColor = "none";
     }
 
-    // click event triggers hit function
     row.addEventListener("click", (event) => {
-      console.log(i, j);
+      if (player2.classList.contains("active")) {
+        console.log(i, j);
 
-      if (row.textContent != "miss") {
-        computer.board.receiveAttack(i, j);
+        if (row.textContent != "miss") {
+          computer.board.receiveAttack(i, j);
+        }
+
+        if (typeof board2[i][j][0] === "object") {
+          row.style.borderColor = "red";
+          row.style.borderStyle = "dashed";
+
+          board2[i][j][0].hit;
+        } else {
+          row.textContent = board2[i][j][0];
+        }
+
+        playerTurn("computer");
+
+        // computer automatically attacks after player's turn
+        const x = computerAttacks().column;
+        const y = computerAttacks().row;
+        console.log(x, y);
+        player.board.receiveAttack(x, y);
+
+        const playerBoard = document.querySelector(`#row${x}${y}`);
+
+        if (player.board.getBoard()[x][y][0] == "miss") {
+          playerBoard.textContent = "miss";
+        } else if (player.board.getBoard()[x][y][0].length > 0) {
+          playerBoard.style.borderStyle = "dashed";
+          playerBoard.style.borderColor = "red";
+        }
+
+        playerTurn("player");
       }
-
-      if (board2[i][j][0] != "miss") {
-        board2[i][j][0].hit;
-        row.style.borderStyle = "dashed";
-        row.style.borderColor = "red";
-      } else {
-        row.textContent = board2[i][j][0];
-      }
-
-      switchPlayer(computer);
     });
   }
 }

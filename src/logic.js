@@ -21,11 +21,9 @@ class Ship {
 function createBoard() {
   const board = [];
 
-  // create rows
   for (let i = 0; i < 10; i++) {
     board.push([]);
 
-    // create columns
     for (let j = 0; j < 10; j++) {
       board[i].push([]);
     }
@@ -46,20 +44,18 @@ function placeShips(coordinates, getBoard) {
     if (column > 10 || row > 10) {
       throw new Error("Out of range. Coordinates must be between 0 and 10.");
     } else {
+      // push reference
       const ship = new Ship(size);
 
-      // horizontal orientation
       for (let l = 0; l < size; l++) {
         if (orientation == "horizontal") {
           if (column + size > 9) {
-            // push reference
             getBoard[column - l][row].push(ship);
           } else {
             getBoard[column + l][row].push(ship);
           }
         }
 
-        // vertical orientation
         if (orientation == "vertical") {
           if (row + size > 9) {
             getBoard[column][row - l].push(ship);
@@ -101,8 +97,7 @@ class Gameboard {
       throw new Error("Out of range. Cooordinates must be between 0 and 10.");
     }
 
-    // no action if already a miss
-    if (this.board[column][row].length > 0) {
+    if (typeof this.board[column][row][0] === "object") {
       if (this.board[column][row][0].hit != this.board[column][row][0].length) {
         this.board[column][row][0].takeHit();
         console.log(this.board[column][row][0]);
@@ -126,9 +121,9 @@ class Gameboard {
   }
 }
 
+// throws an error if ships overlap
 class Player {
   constructor(array) {
-    // prevent overlapping ships
     for (let i = 0, j = i + 1; i < array.length; i++, j++) {
       let index = j;
       while (index < array.length) {
@@ -166,4 +161,39 @@ class Player {
   }
 }
 
-export { createBoard, placeShips, Ship, Player };
+function playerTurn(activeplayer) {
+  if (activeplayer === "player") {
+    player1.classList = "inactive";
+    player2.classList = "active";
+  }
+  if (activeplayer === "computer") {
+    player1.classList = "active";
+    player2.classList = "inactive";
+  }
+}
+
+function getLastValue(set) {
+  let value;
+  for (value of set) {
+    return value;
+  }
+}
+
+// computer targets area on the board to attack once
+function computerAttacks() {
+  const prevColumn = new Set();
+  const prevRow = new Set();
+
+  prevColumn.add(Math.ceil(Math.random() * 9));
+  prevRow.add(Math.ceil(Math.random() * 9));
+
+  const column = getLastValue(prevColumn);
+  const row = getLastValue(prevRow);
+
+  return {
+    column,
+    row,
+  };
+}
+
+export { createBoard, placeShips, Ship, Player, playerTurn, computerAttacks };
