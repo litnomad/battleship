@@ -5,6 +5,8 @@ import {
   Ship,
   Player,
   computerAttacks,
+  gameOver,
+  allSunk,
 } from "./logic.js";
 
 test("createBoard returns a 10x10 board", () => {
@@ -28,7 +30,7 @@ test("placeShips adds ships into the board using coordinates", () => {
   expect(board[5][2][0]).toBeInstanceOf(Ship);
 });
 
-describe("new player gets a gameboard", () => {
+describe("first player gets a gameboard", () => {
   const player = new Player([
     [[0, 8], 3, "horizontal"],
     [[5, 0], 4, "vertical"],
@@ -37,7 +39,7 @@ describe("new player gets a gameboard", () => {
     [[9, 7], 3, "vertical"],
   ]);
 
-  test("ships placed for new player", () => {
+  test("all ships are placed", () => {
     expect(player.board.getBoard()[0][8][0]).toBeInstanceOf(Ship);
     expect(player.board.getBoard()[5][0][0]).toBeInstanceOf(Ship);
     expect(player.board.getBoard()[9][0][0]).toBeInstanceOf(Ship);
@@ -84,5 +86,74 @@ describe("new player gets a gameboard", () => {
 
     expect(x).toBe(a);
     expect(y).toBe(b);
+  });
+});
+
+describe("second player gets a gameboard", () => {
+  const computer = new Player([
+    [[0, 0], 6, "horizontal"],
+    [[0, 5], 4, "vertical"],
+    [[4, 7], 2, "vertical"],
+    [[1, 9], 3, "horizontal"],
+    [[6, 9], 3, "horizontal"],
+  ]);
+
+  test("all ships are placed", () => {
+    expect(computer.board.getBoard()[0][0][0]).toBeInstanceOf(Ship);
+    expect(computer.board.getBoard()[0][5][0]).toBeInstanceOf(Ship);
+    expect(computer.board.getBoard()[4][7][0]).toBeInstanceOf(Ship);
+    expect(computer.board.getBoard()[1][9][0]).toBeInstanceOf(Ship);
+    expect(computer.board.getBoard()[6][9][0]).toBeInstanceOf(Ship);
+  });
+});
+
+describe("throws an error when ships overlap", () => {
+  test("throws an error for horizontal ships with lengths 6 and 4 at 0,0 and 0,5", () => {
+    expect(
+      () =>
+        new Player([
+          [[0, 0], 6, "horizontal"],
+          [[0, 5], 4, "horizontal"],
+          [[4, 7], 2, "vertical"],
+          [[1, 9], 3, "horizontal"],
+          [[6, 9], 3, "horizontal"],
+        ]),
+    ).toThrow("No overlapping ships!");
+  });
+
+  test("throws an error for vertical ships with lengths 5 and 2 at 3,0 and 3,1", () => {
+    expect(
+      () =>
+        new Player([
+          [[0, 0], 5, "vertical"],
+          [[0, 1], 2, "vertical"],
+          [[4, 7], 2, "vertical"],
+          [[1, 9], 3, "horizontal"],
+          [[6, 9], 3, "horizontal"],
+        ]),
+    ).toThrow("No overlapping ships!");
+  });
+});
+
+describe("win condition when all ships are sunk", () => {
+  const player = new Player([
+    [[0, 0], 3, "horizontal"],
+    [[0, 5], 2, "vertical"],
+    [[4, 7], 1, "vertical"],
+    [[1, 9], 1, "horizontal"],
+    [[6, 9], 1, "horizontal"],
+  ]);
+
+  player.board.receiveAttack(0, 0);
+  player.board.receiveAttack(1, 0);
+  player.board.receiveAttack(2, 0);
+  player.board.receiveAttack(0, 5);
+  player.board.receiveAttack(0, 6);
+  player.board.receiveAttack(4, 7);
+  player.board.receiveAttack(1, 9);
+  player.board.receiveAttack(6, 9);
+
+  test("allSunk(player.board.getBoard()) returns true when all ships are sunk", () => {
+    expect(allSunk(player.board.getBoard())).toBe(true);
   });
 });
