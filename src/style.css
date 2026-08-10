@@ -34,3 +34,8 @@ body {
   background-color: lightgrey;
   border: 1px dashed lightgray;
 }
+
+#player1 div.hit,
+#player2 div.hit {
+  border: 1px dashed red;
+}

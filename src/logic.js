@@ -1,10 +1,10 @@
 class Ship {
+  length;
   hit = 0;
   sunk = false;
-  length;
 
-  constructor(length) {
-    this.length = length;
+  constructor(num) {
+    this.length = num;
   }
 
   takeHit() {
@@ -44,11 +44,10 @@ function placeShips(coordinates, getBoard) {
     if (column > 10 || row > 10) {
       throw new Error("Out of range. Coordinates must be between 0 and 10.");
     } else {
-      // push reference
       const ship = new Ship(size);
 
       for (let l = 0; l < size; l++) {
-        if (orientation == "horizontal") {
+        if (orientation === "horizontal") {
           if (column + size > 9) {
             getBoard[column - l][row].push(ship);
           } else {
@@ -56,7 +55,7 @@ function placeShips(coordinates, getBoard) {
           }
         }
 
-        if (orientation == "vertical") {
+        if (orientation === "vertical") {
           if (row + size > 9) {
             getBoard[column][row - l].push(ship);
           } else {
@@ -80,7 +79,7 @@ class Gameboard {
     [[g, h], length4, orientation4],
     [[i, j], length5, orientation5],
   ]) {
-    this.map = placeShips(
+    this.place = placeShips(
       [
         [[a, b], length1, orientation1],
         [[c, d], length2, orientation2],
@@ -97,10 +96,9 @@ class Gameboard {
       throw new Error("Out of range. Cooordinates must be between 0 and 10.");
     }
 
-    if (typeof this.board[column][row][0] === "object") {
+    if (this.board[column][row][0] instanceof Ship) {
       if (this.board[column][row][0].hit != this.board[column][row][0].length) {
         this.board[column][row][0].takeHit();
-        console.log(this.board[column][row][0]);
       }
 
       if (this.board[column][row][0].hit == this.board[column][row][0].length) {
@@ -109,19 +107,24 @@ class Gameboard {
       }
     } else {
       this.board[column][row].push("miss");
-      console.log(this.board[column][row][0]);
     }
   }
 
-  sunk() {
-    if (this.board.every(this.ship.sunk() === true)) {
-      return true;
+  allSunk() {
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        if (this.board[i][j][0] instanceof Ship) {
+          if (this.board[i][j][0].sunk === false) {
+            return false;
+          }
+        }
+      }
     }
-    return false;
+    return true;
   }
 }
 
-// throws an error if ships overlap
+// creates board for player and throws an error if ships overlap
 class Player {
   constructor(input) {
     for (let i = 0, j = i + 1; i < input.length; i++, j++) {
@@ -161,17 +164,6 @@ class Player {
   }
 }
 
-function playerTurn(activeplayer) {
-  if (activeplayer === "player") {
-    player1.classList = "inactive";
-    player2.classList = "active";
-  }
-  if (activeplayer === "computer") {
-    player1.classList = "active";
-    player2.classList = "inactive";
-  }
-}
-
 function getLastValue(set) {
   let value;
   for (value of set) {
@@ -179,8 +171,8 @@ function getLastValue(set) {
   }
 }
 
-// computer targets area on the board to attack once
-function computerAttacks() {
+// computer only targets an area on the board once
+function randomMove() {
   const prevColumn = new Set();
   const prevRow = new Set();
 
@@ -196,32 +188,4 @@ function computerAttacks() {
   };
 }
 
-// returns true if all ships are sunk, otherwise returns false
-function allSunk(gameBoard) {
-  for (let column = 0; column < gameBoard.length; column++) {
-    for (let row = 0; row < gameBoard[column].length; row++) {
-      if (typeof gameBoard[column][row][0] == "object") {
-        if (gameBoard[column][row][0].sunk == false) {
-          return false;
-        }
-        if (gameBoard[column][row][0].sunk == true) {
-          continue;
-        }
-      }
-      if (gameBoard[column][row][0] == "miss") {
-        continue;
-      }
-    }
-    return true;
-  }
-}
-
-export {
-  createBoard,
-  placeShips,
-  Ship,
-  Player,
-  playerTurn,
-  computerAttacks,
-  allSunk,
-};
+export { createBoard, placeShips, Player, Ship, randomMove };

@@ -2,11 +2,9 @@ import { experiments } from "webpack";
 import {
   createBoard,
   placeShips,
-  Ship,
   Player,
-  computerAttacks,
-  gameOver,
-  allSunk,
+  Ship,
+  randomMove,
 } from "./logic.js";
 
 test("createBoard returns a 10x10 board", () => {
@@ -67,19 +65,19 @@ describe("first player gets a gameboard", () => {
     expect(player.board.getBoard()[0][8][0].sunk).toBe(true);
   });
 
-  test("computerAttacks generates random x,y coordinates", () => {
-    const x = computerAttacks().column;
-    const y = computerAttacks().row;
+  test("randomMove generates random x,y coordinates", () => {
+    const x = randomMove().column;
+    const y = randomMove().row;
 
     expect(Number.isInteger(x)).toBe(true);
     expect(Number.isInteger(y)).toBe(true);
   });
 
-  test("computerAttacks generates random x,y coordinates between 0-9", () => {
+  test("randomMove generates random x,y coordinates between 0-9", () => {
     const integars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    const x = computerAttacks().column;
-    const y = computerAttacks().row;
+    const x = randomMove().column;
+    const y = randomMove().row;
 
     const a = integars.find((e) => e === x);
     const b = integars.find((e) => e === y);
@@ -136,24 +134,43 @@ describe("throws an error when ships overlap", () => {
 });
 
 describe("win condition when all ships are sunk", () => {
-  const player = new Player([
-    [[0, 0], 3, "horizontal"],
-    [[0, 5], 2, "vertical"],
-    [[4, 7], 1, "vertical"],
-    [[1, 9], 1, "horizontal"],
-    [[6, 9], 1, "horizontal"],
-  ]);
+  test("allSunk() method returns true when all ships are sunk", () => {
+    const player = new Player([
+      [[0, 0], 3, "horizontal"],
+      [[0, 5], 2, "vertical"],
+      [[4, 7], 1, "vertical"],
+      [[1, 9], 1, "horizontal"],
+      [[6, 9], 1, "horizontal"],
+    ]);
 
-  player.board.receiveAttack(0, 0);
-  player.board.receiveAttack(1, 0);
-  player.board.receiveAttack(2, 0);
-  player.board.receiveAttack(0, 5);
-  player.board.receiveAttack(0, 6);
-  player.board.receiveAttack(4, 7);
-  player.board.receiveAttack(1, 9);
-  player.board.receiveAttack(6, 9);
+    player.board.receiveAttack(0, 0);
+    player.board.receiveAttack(1, 0);
+    player.board.receiveAttack(2, 0);
+    player.board.receiveAttack(0, 5);
+    player.board.receiveAttack(0, 6);
+    player.board.receiveAttack(4, 7);
+    player.board.receiveAttack(1, 9);
+    player.board.receiveAttack(6, 9);
 
-  test("allSunk(player.board.getBoard()) returns true when all ships are sunk", () => {
-    expect(allSunk(player.board.getBoard())).toBe(true);
+    expect(player.board.allSunk()).toBe(true);
+  });
+
+  test("allSunk() method returns false when not all ships are sunk", () => {
+    const player = new Player([
+      [[0, 0], 3, "horizontal"],
+      [[0, 5], 2, "vertical"],
+      [[4, 7], 1, "vertical"],
+      [[1, 9], 1, "horizontal"],
+      [[6, 9], 1, "horizontal"],
+    ]);
+
+    player.board.receiveAttack(0, 0);
+    player.board.receiveAttack(1, 0);
+    player.board.receiveAttack(2, 0);
+    player.board.receiveAttack(0, 5);
+    player.board.receiveAttack(0, 6);
+    player.board.receiveAttack(4, 7);
+
+    expect(player.board.allSunk()).toBe(false);
   });
 });
