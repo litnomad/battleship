@@ -176,8 +176,8 @@ function randomMove() {
   const prevColumn = new Set();
   const prevRow = new Set();
 
-  prevColumn.add(Math.ceil(Math.random() * 9));
-  prevRow.add(Math.ceil(Math.random() * 9));
+  prevColumn.add(Math.floor(Math.random() * 10));
+  prevRow.add(Math.floor(Math.random() * 10));
 
   const column = getLastValue(prevColumn);
   const row = getLastValue(prevRow);
