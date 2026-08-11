@@ -49,16 +49,28 @@ function placeShips(coordinates, getBoard) {
       for (let l = 0; l < size; l++) {
         if (orientation === "horizontal") {
           if (column + size > 9) {
+            if (getBoard[column - l][row][0] instanceof Ship) {
+              throw new Error(`Overlapping ships at ${column - l}, ${row}}`);
+            }
             getBoard[column - l][row].push(ship);
           } else {
+            if (getBoard[column + l][row][0] instanceof Ship) {
+              throw new Error(`Overlapping ships at ${column + l}, ${row}}`);
+            }
             getBoard[column + l][row].push(ship);
           }
         }
 
         if (orientation === "vertical") {
           if (row + size > 9) {
+            if (getBoard[column][row - l][0] instanceof Ship) {
+              throw new Error(`Overlapping ships at ${column}, ${row - l}`);
+            }
             getBoard[column][row - l].push(ship);
           } else {
+            if (getBoard[column][row + l][0] instanceof Ship) {
+              throw new Error(`Overlapping ships at ${column}, ${row + l}`);
+            }
             getBoard[column][row + l].push(ship);
           }
         }
@@ -124,42 +136,8 @@ class Gameboard {
   }
 }
 
-// creates board for player and throws an error if ships overlap
 class Player {
   constructor(input) {
-    for (let i = 0, j = i + 1; i < input.length; i++, j++) {
-      let index = j;
-      while (index < input.length) {
-        let col1 = input[i][0][0];
-        let col2 = input[index][0][0];
-        let dir1 = input[i][2];
-        let dir2 = input[index][2];
-        if (col1 == col2 && dir1 == dir2) {
-          let row1 = input[i][0][1];
-          let row2 = input[index][0][1];
-          let length1 = input[i][1];
-          let length2 = input[index][1];
-          while (length1 > 0) {
-            if (row1 == row2) {
-              throw new Error("No overlapping ships!");
-            }
-            row1++;
-            length1--;
-          }
-
-          while (length2 > 0) {
-            row2++;
-            if (row1 == row2) {
-              throw new Error("No overlapping ships!");
-            }
-            length2--;
-          }
-        }
-
-        index++;
-      }
-    }
-
     this.board = new Gameboard(input);
   }
 }

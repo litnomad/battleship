@@ -1,11 +1,5 @@
 import { experiments } from "webpack";
-import {
-  createBoard,
-  placeShips,
-  Player,
-  Ship,
-  randomMove,
-} from "./logic.js";
+import { createBoard, placeShips, Player, Ship, randomMove } from "./logic.js";
 
 test("createBoard returns a 10x10 board", () => {
   const board = createBoard();
@@ -106,20 +100,20 @@ describe("second player gets a gameboard", () => {
 });
 
 describe("throws an error when ships overlap", () => {
-  test("throws an error for horizontal ships with lengths 6 and 4 at 0,0 and 0,5", () => {
+  test("throws an error for vertical ships with lengths 6 at 0,8 and 0,0", () => {
     expect(
       () =>
         new Player([
-          [[0, 0], 6, "horizontal"],
-          [[0, 5], 4, "horizontal"],
+          [[0, 8], 6, "vertical"],
+          [[0, 0], 6, "vertical"],
           [[4, 7], 2, "vertical"],
           [[1, 9], 3, "horizontal"],
           [[6, 9], 3, "horizontal"],
         ]),
-    ).toThrow("No overlapping ships!");
+    ).toThrow(Error);
   });
 
-  test("throws an error for vertical ships with lengths 5 and 2 at 3,0 and 3,1", () => {
+  test("throws an error for vertical ships with lengths 5 and 2 at 0,0 and 0,1", () => {
     expect(
       () =>
         new Player([
@@ -129,8 +123,9 @@ describe("throws an error when ships overlap", () => {
           [[1, 9], 3, "horizontal"],
           [[6, 9], 3, "horizontal"],
         ]),
-    ).toThrow("No overlapping ships!");
+    ).toThrow("Overlapping ships at 0, 1");
   });
+
 });
 
 describe("win condition when all ships are sunk", () => {

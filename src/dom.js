@@ -52,6 +52,13 @@ confirmBtn.addEventListener("click", (e) => {
   render(player, computer);
 });
 
+// alerts if error is thrown for overlapping ships
+window.addEventListener("error", (event) => {
+  if (event.message) {
+    alert(`${event.message}. Please choose another coordinate.`)
+  }
+})
+
 function render(player, computer) {
   // render player 1 gameboard
   const player1 = document.querySelector("#player1");
