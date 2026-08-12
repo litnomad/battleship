@@ -1,5 +1,5 @@
-import { experiments } from "webpack";
 import { createBoard, placeShips, Player, Ship, randomMove } from "./logic.js";
+import { computerAttack } from "./gameController.js";
 
 test("createBoard returns a 10x10 board", () => {
   const board = createBoard();
@@ -59,7 +59,7 @@ describe("first player gets a gameboard", () => {
     expect(player.board.getBoard()[0][8][0].sunk).toBe(true);
   });
 
-  test("randomMove generates random x,y coordinates", () => {
+  test("randomMove generates integers", () => {
     const x = randomMove().column;
     const y = randomMove().row;
 
@@ -67,7 +67,7 @@ describe("first player gets a gameboard", () => {
     expect(Number.isInteger(y)).toBe(true);
   });
 
-  test("randomMove generates random x,y coordinates between 0-9", () => {
+  test("randomMove generates coordinates between 0-9", () => {
     const integars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const x = randomMove().column;
@@ -78,6 +78,45 @@ describe("first player gets a gameboard", () => {
 
     expect(x).toBe(a);
     expect(y).toBe(b);
+  });
+
+  test("randomMove does not generate the same numbers", () => {
+    const numbers = [];
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+    numbers.push(randomMove());
+
+    const mockCallback = jest.fn((numbers) => {
+      let n = numbers.length;
+
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+          if (
+            numbers[i].column === numbers[j].column &&
+            numbers[i].row === numbers[j].row
+          ) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    });
+
+    mockCallback(numbers);
+
+    expect(mockCallback).toHaveBeenCalled();
+    expect(mockCallback.mock.results[0].value).toBe(false);
   });
 });
 
@@ -125,7 +164,6 @@ describe("throws an error when ships overlap", () => {
         ]),
     ).toThrow("Overlapping ships at 0, 1");
   });
-
 });
 
 describe("win condition when all ships are sunk", () => {
@@ -165,6 +203,21 @@ describe("win condition when all ships are sunk", () => {
     player.board.receiveAttack(0, 5);
     player.board.receiveAttack(0, 6);
     player.board.receiveAttack(4, 7);
+
+    expect(player.board.allSunk()).toBe(false);
+  });
+
+  test("allSunk() method returns false when not all ships are sunk", () => {
+    const player = new Player([
+      [[0, 0], 3, "horizontal"],
+      [[0, 5], 2, "vertical"],
+      [[4, 7], 1, "vertical"],
+      [[1, 9], 1, "horizontal"],
+      [[6, 9], 1, "horizontal"],
+    ]);
+
+    player.board.receiveAttack(0, 0);
+    player.board.receiveAttack(1, 0);
 
     expect(player.board.allSunk()).toBe(false);
   });

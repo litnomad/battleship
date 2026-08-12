@@ -30,9 +30,9 @@ function gameOver(player, computer) {
 }
 
 function computerAttack(player, playerBoard) {
-  const x = randomMove().column;
-  const y = randomMove().row;
+  const { column: x, row: y } = randomMove();
   player.board.receiveAttack(x, y);
+  console.log(x, y);
 
   const selector = document.getElementById(`${x}-${y}`);
 

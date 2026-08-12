@@ -142,23 +142,20 @@ class Player {
   }
 }
 
-function getLastValue(set) {
-  let value;
-  for (value of set) {
-    return value;
-  }
-}
-
 // computer only targets an area on the board once
+const previous = new Set();
 function randomMove() {
-  const prevColumn = new Set();
-  const prevRow = new Set();
+  let x, y, stringify;
+  do {
+    x = Math.floor(Math.random() * 10);
+    y = Math.floor(Math.random() * 10);
+    stringify = [x, y].toString();
+  } while (previous.has(stringify));
 
-  prevColumn.add(Math.floor(Math.random() * 10));
-  prevRow.add(Math.floor(Math.random() * 10));
+  previous.add(stringify);
 
-  const column = getLastValue(prevColumn);
-  const row = getLastValue(prevRow);
+  const column = Number(x);
+  const row = Number(y);
 
   return {
     column,
